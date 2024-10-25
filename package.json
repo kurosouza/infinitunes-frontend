@@ -9,9 +9,12 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "grommet": "^2.41.0",
+    "grommet-icons": "^4.12.1",
+    "next": "15.0.1",
     "react": "19.0.0-rc-69d4b800-20241021",
     "react-dom": "19.0.0-rc-69d4b800-20241021",
-    "next": "15.0.1"
+    "styled-components": "^6.1.13"
   },
   "devDependencies": {
     "eslint": "^8",
