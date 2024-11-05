@@ -1,60 +1,99 @@
-// FilteringCards.js
-import { useContext } from "react";
+"use client";
+import React, { useContext } from "react";
 import {
   Box,
+  Button,
   Cards,
-  Data,
-  DataFilters,
-  DataSearch,
-  DataSummary,
   Grid,
   Heading,
+  Form,
+  FormField,
+  Image as GrommetImage,
   Page,
   PageContent,
-  PageHeader,
   ResponsiveContext,
+  PageHeader,
   Text,
-  Toolbar,
+  TextInput,
 } from "grommet";
-import { Card } from "./components/Card";
-import { users } from "./mockData";
+import { Music, CirclePlay, Search as SearchIcon } from "grommet-icons";
+import { useSearchParams, usePathname, useRouter } from "next/navigation";
+import { Card } from "./../components/Card";
+import Image from "next/image";
 
-// Define Data properties
-const properties = {
-  role: { label: "Role" },
-  status: { label: "Status" },
-  location: { label: "Location" },
-  hoursAvailable: {
-    label: "Remaining hours available",
-    range: { min: 0, max: 40 },
-  },
-  name: { label: "Name" },
-};
+const fetcher = async (...args) => fetch(...args).then((res) => res.json());
 
-const FilteringCards = () => (
-  <Page>
-    <PageContent gap="medium">
-      <Heading level={2} margin="none" color="brand">
-        Search for some songs
-      </Heading>
-      <Grid
-        // Use Grid with height prop for sticky header and scrollable results
-        height={{ min: "medium" }}
-      >
-        <Data data={users} properties={properties}>
-          <Toolbar>
-            <DataSearch width="large" responsive />
-            <DataFilters layer />
-          </Toolbar>
-          <DataSummary />
-          <Users />
-        </Data>
-      </Grid>
-    </PageContent>
-  </Page>
-);
+const songsEndpointUrl =
+  "http://infinituneapi.codegarage.cloud/infinitune/infinitune/songs";
 
-const Users = () => {
+export default function SearchPage() {
+  const [value, setValue] = React.useState();
+  const [songs, setSongs] = React.useState([]);
+  const searchParams = useSearchParams();
+  const pathname = usePathname();
+  const { replace } = useRouter();
+
+  function handleSearch(songQuery) {
+    const params = new URLSearchParams(searchParams);
+    if (songQuery) {
+      params.set("q", songQuery);
+    } else {
+      params.delete("q");
+    }
+    return `${songsEndpointUrl}?${params.toString()}`;
+  }
+
+  return (
+    <Page kind="narrow">
+      <PageContent gap="medium" margin={{ bottom: "medium" }}>
+        <Box margin={{ top: "medium", bottom: "xxsmall" }}>
+          <Image
+            src="/music-photo.jpg"
+            alt="people at a concert"
+            width={800}
+            height={200}
+            style={{ objectFit: "cover" }}
+          />
+        </Box>
+        <PageHeader
+          margin={{ top: "xxsmall" }}
+          pad={{ top: "xxsmall" }}
+          title={
+            <Heading level={1} color="brand" margin={{ vertical: "0px" }}>
+              infinitunes
+            </Heading>
+          }
+          subtitle="find the music you love."
+        ></PageHeader>
+        <Form
+          onSubmit={async () => {
+            console.log("search form submitted.");
+            console.log(event);
+            let search_url = handleSearch(value);
+            console.log("search_url: " + search_url);
+
+            let songs_result = await fetcher(search_url);
+            console.log("found songs: ", songs_result);
+            setSongs(songs_result.songs);
+          }}
+        >
+          <TextInput
+            aria-label="search"
+            icon={<SearchIcon />}
+            placeholder="Find a song"
+            reverse
+            value={value}
+            onChange={(event) => setValue(event.target.value)}
+            type="search"
+          />
+        </Form>
+        <Songs songs={songs} />
+      </PageContent>
+    </Page>
+  );
+}
+
+const Songs = (props) => {
   const breakpoint = useContext(ResponsiveContext);
 
   return (
@@ -62,12 +101,13 @@ const Users = () => {
       <Cards
         columns={!["xsmall", "small"].includes(breakpoint) ? "small" : ["auto"]}
         gap={!["xsmall", "small"].includes(breakpoint) ? "medium" : "small"}
+        data={props.songs}
       >
         {(datum) => (
           <Card
             key={datum.id}
             // margin ensures focus on cards is not cutoff
-            margin="xxsmal"
+            margin="xxsmall"
             pad="medium"
             onClick={() => {
               // eslint-disable-next-line no-alert
@@ -78,7 +118,7 @@ const Users = () => {
             }}
             icon={
               <Box align="center" direction="row" gap="xsmall">
-                <Box
+                <CirclePlay
                   background={datum.status === "Online" ? "brand" : "text-weak"}
                   pad="xsmall"
                   round
@@ -95,7 +135,9 @@ const Users = () => {
             level={4}
           >
             <Box flex justify="end">
-              <Text size="small">Artist</Text>
+              <Text size="small" color="brand">
+                Artist
+              </Text>
               <Text color="text-strong">{datum.artist}</Text>
             </Box>
           </Card>
@@ -104,5 +146,3 @@ const Users = () => {
     </Box>
   );
 };
-
-export default FilteringCards;
