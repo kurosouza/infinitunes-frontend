@@ -8,6 +8,7 @@ import {
   Heading,
   Form,
   FormField,
+  Image as GrommetImage,
   Page,
   PageContent,
   ResponsiveContext,
@@ -15,9 +16,10 @@ import {
   Text,
   TextInput,
 } from "grommet";
-import { Search as SearchIcon } from "grommet-icons";
+import { Music, CirclePlay, Search as SearchIcon } from "grommet-icons";
 import { useSearchParams, usePathname, useRouter } from "next/navigation";
 import { Card } from "./components/Card";
+import Image from "next/image";
 
 let songData = [
   {
@@ -58,8 +60,26 @@ export default function SearchPage() {
 
   return (
     <Page kind="narrow">
-      <PageContent gap="medium">
-        <PageHeader title="infinitunes" subtitle="find the music you love." />
+      <PageContent gap="medium" margin={{ bottom: "medium" }}>
+        <Box margin={{ top: "medium", bottom: "xxsmall" }}>
+          <Image
+            src="/music-photo.jpg"
+            alt="people at a concert"
+            width={800}
+            height={200}
+            style={{ objectFit: "cover" }}
+          />
+        </Box>
+        <PageHeader
+          margin={{ top: "xxsmall" }}
+          pad={{ top: "xxsmall" }}
+          title={
+            <Heading level={1} color="brand" margin={{ vertical: "0px" }}>
+              infinitunes
+            </Heading>
+          }
+          subtitle="find the music you love."
+        ></PageHeader>
         <Form
           onSubmit={async () => {
             console.log("search form submitted.");
@@ -69,8 +89,6 @@ export default function SearchPage() {
 
             let songs_result = await fetcher(search_url);
             console.log("found songs: ", songs_result);
-            // songData.splice(0, songData.length);
-            // songs_result.songs.forEach((song) => songData.push(song));
             setSongs(songs_result.songs);
           }}
         >
@@ -115,7 +133,7 @@ const Songs = (props) => {
             }}
             icon={
               <Box align="center" direction="row" gap="xsmall">
-                <Box
+                <CirclePlay
                   background={datum.status === "Online" ? "brand" : "text-weak"}
                   pad="xsmall"
                   round
@@ -132,7 +150,9 @@ const Songs = (props) => {
             level={4}
           >
             <Box flex justify="end">
-              <Text size="small">Artist</Text>
+              <Text size="small" color="brand">
+                Artist
+              </Text>
               <Text color="text-strong">{datum.artist}</Text>
             </Box>
           </Card>
