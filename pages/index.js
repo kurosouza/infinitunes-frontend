@@ -11,6 +11,7 @@ import {
   Heading,
   Page,
   PageContent,
+  PageHeader,
   ResponsiveContext,
   Text,
   Toolbar,
@@ -33,7 +34,7 @@ const properties = {
 const FilteringCards = () => (
   <Page>
     <PageContent gap="medium">
-      <Heading level={2} margin="none">
+      <Heading level={2} margin="none" color="brand">
         Search for some songs
       </Heading>
       <Grid
@@ -85,13 +86,17 @@ const Users = () => {
                 <Text color="text-strong">{datum.status}</Text>
               </Box>
             }
-            title={datum.name}
-            subtitle={datum.location}
+            title={datum.title}
+            subtitle={
+              <Text color="green" size="xsmall">
+                listen on Spotify
+              </Text>
+            }
             level={4}
           >
             <Box flex justify="end">
               <Text size="small">Artist</Text>
-              <Text color="text-strong">{datum.role}</Text>
+              <Text color="text-strong">{datum.artist}</Text>
             </Box>
           </Card>
         )}
